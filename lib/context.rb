@@ -2,21 +2,26 @@ require 'open-uri'
 require 'JSON'
 
 class Context
-  USERNAME    = (raise 'No name given. Put your github username on line 5 of lib/context.rb') #'YOUR_GITHUB_USERNAME_HERE'
-  PROFILE_URL = "https://api.github.com/users/#{USERNAME}"
-  REPOS_URL   = "https://api.github.com/users/#{USERNAME}/repos?sort=updated"
+  USERNAME    = (raise 'No name given. Put your github username on line 5 of lib/context.rb')
+               #^^^^^^^^^^^^^^'YOUR_GITHUB_USERNAME_HERE^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^'
+  PROFILE_URL = "https://api.github.com/users/#{USERNAME}"#dont change this line
+  REPOS_URL   = "https://api.github.com/users/#{USERNAME}/repos?sort=updated"#dont change this line
 
   def initialize(data_src = :static)
     case data_src
     when :static
       begin
-        @profile_data = JSON.parse(open('profile.json'))
-        @repos_data   = JSON.parse(open('repos.json'))
+        @profile_data = JSON.parse(open('profile.json').read)
+        @repos_data   = JSON.parse(open('repos.json').read)
       rescue StandardError => error
-        if error.message.scan(/[a-z]+\.json/).first == 'profile.json'
+        puts error
+        case error.message.scan(/[a-z]+\.json/).first
+        when 'profile.json'
           STDERR.puts "No profile data given. go to #{PROFILE_URL} and paste the response here"
-        else
+        when 'repos.json'
           STDERR.puts "No repos data given. go to #{REPOS_URL} and paste the response here"
+        else
+          STDERR.puts "Unknown Error: Either something is wrong in your template or you need to post this error in hipchat"
         end
       end
     when :live
