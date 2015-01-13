@@ -32,7 +32,6 @@ class Context
     else
       raise ArgumentError, "#{data_src} is not a valid data_src"
     end
-    @name = @profile_data['name']
   end
 
   def get_binding
